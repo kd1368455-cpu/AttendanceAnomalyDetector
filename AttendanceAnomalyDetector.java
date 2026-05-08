@@ -1,25 +1,23 @@
 package main;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
-public class AttendanceAnomalyDetector {
+public class AttendanceAnalyzer {
+	public void analyze(List<AttendanceRecord> records) {
 
-	public static void main(String[] args) {
-		// ダミー勤怠データ（テスト用）
-        List<AttendanceRecord> records = new ArrayList<>();
-        records.add(new AttendanceRecord("E001",
-                LocalDateTime.of(2024, 5, 1, 9, 30),
-                LocalDateTime.of(2024, 5, 1, 18, 0)));
+        for (AttendanceRecord record : records) {
 
-        records.add(new AttendanceRecord("E002",
-                LocalDateTime.of(2024, 5, 1, 8, 55),
-                LocalDateTime.of(2024, 5, 1, 22, 30)));
+            // 遅刻チェック（9:00より後に出勤）
+            if (record.getClockIn().getHour() >= 9 && record.getClockIn().getMinute() > 0) {
+                System.out.println(record.getEmployeeId() + " は遅刻の可能性があります");
+            }
 
-        // 異常検知の実行
-        AttendanceAnalyzer analyzer = new AttendanceAnalyzer();
-        analyzer.analyze(records);
+            // 長時間労働チェック（10時間以上）
+            long workHours = java.time.Duration.between(
+                    record.getClockIn(), record.getClockOut()).toHours();
 
-	}
-
+            if (workHours >= 10) {
+                System.out.println(record.getEmployeeId() + " は長時間労働の可能性があります");
+            }
+        }
+    }
 }
